@@ -43,7 +43,27 @@ class DockerBuildTool(object):
 
         self.download(args.src, args.dst)
 
+    def command_apt_install(self):
+        pass
 
+    def command_replace(self):
+        parser.add_argument('search', metavar='SEARCH', type=str)
+        parser.add_argument('replace', metavar='REPLACE', type=str)
+        parser.add_argument('path', metavar='PATH', type=str)
+        args = parser.parse_args(ARGS)
+
+        with open(args.path) as f:
+            contents = f.read()
+
+        if not args.search in contents:
+            print("Unable to find '%s' in %s" % (args.search, args.path))
+            exit(1)
+
+        contents = contents.replace(args.search, args.replace)
+
+        with open(args.path, 'w') as f:
+            f.write(contents)
+        
 if __name__ == '__main__':
     dbt = DockerBuildTool()
     getattr(dbt, "command_" + COMMAND)()
