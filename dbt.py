@@ -10,6 +10,8 @@ import sys
 
 import os
 
+from subprocess import check_call
+
 try:
     COMMAND = sys.argv[1].lower().replace("-", "_")
 except IndexError as e:
@@ -37,7 +39,13 @@ class DockerBuildTool(object):
         parser.add_argument('-c', '--clean', dest="clean", action="store_true")
 
     def command_prepare_shell(self):
+        parser.add_argument('-n', '--name', dest='name', type=str, help='host/app-name')
+        args = parser.parse_args(ARGS)
+
         self.download("https://raw.githubusercontent.com/klamar/docker-build-tool/master/res/bash/bashrc", "/root/.bashrc")
+
+        if args.name:
+            check_call(["dbt", "replace", "]\h\[", "]%s\[\033[38;5;11m\]@\[$(tput sgr0)\]\h\[" % args.name, "/root/.bashrc"])
 
     def command_dl(self):
         parser.add_argument('src', metavar='SRC', type=str)
